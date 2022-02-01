@@ -48,6 +48,25 @@ const getUserById = async (userId) => {
   }
 }
 
+const getUserByUsername = async (username) => {
+  try {
+    const {
+      rows: [user],
+    } = await client.query(
+      `
+      SELECT * FROM users
+      WHERE username=$1;
+    `,
+      [username]
+    )
+
+    return user
+  } catch (error) {
+    console.error(`Failed to get user by USERNAME`)
+    throw error
+  }
+}
+
 const updateUser = async (id, fields = {}) => {
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
@@ -297,11 +316,20 @@ const getPostsByTagName = async (tagName) => {
   }
 }
 
+const getAllTags = async () => {
+  const { rows } = await client.query(`
+    SELECT * FROM tags
+  `)
+
+  return rows
+}
+
 module.exports = {
   client,
   createUser,
   getAllUsers,
   getUserById,
+  getUserByUsername,
   updateUser,
   createPost,
   updatePost,
@@ -309,6 +337,7 @@ module.exports = {
   getPostById,
   getAllPosts,
   createTags,
+  getAllTags,
   createPostTag,
   addTagsToPost,
   getPostsByTagName,
