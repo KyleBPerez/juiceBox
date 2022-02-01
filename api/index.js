@@ -31,6 +31,16 @@ apiRouter.use(async (req, res, next) => {
   }
 })
 
+apiRouter.use((req, res, next) => {
+  if (req.user) {
+    console.log('User is set:', req.user)
+  } else {
+    console.log('req.user is a no no')
+  }
+
+  next()
+})
+
 apiRouter.use('/users', require('./users'))
 apiRouter.use('/posts', require('./posts'))
 apiRouter.use('/tags', require('./tags'))
