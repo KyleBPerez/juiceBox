@@ -188,6 +188,13 @@ const getPostById = async (postId) => {
       [postId]
     )
 
+    if (!post) {
+      throw {
+        name: `PostNotFoundError`,
+        message: `Could not find a post with that postId`,
+      }
+    }
+
     const { rows: tags } = await client.query(
       `
       SELECT tags.* FROM tags
@@ -201,7 +208,7 @@ const getPostById = async (postId) => {
       rows: [author],
     } = await client.query(
       `
-      SELECT id,username, name, location
+      SELECT id, username, name, location
       FROM users
       WHERE id=$1;
     `,

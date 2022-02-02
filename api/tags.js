@@ -12,7 +12,11 @@ tagsRouter.get('/:tagName/posts', async (req, res, next) => {
   const { tagName } = req.params
   try {
     const postsByTag = await getPostsByTagName(tagName)
-    res.send({ posts: postsByTag })
+
+    const activePostsByTag = postsByTag.filter(
+      (post) => post.active || (req.user && post.author.id === req.user.id)
+    )
+    res.send({ posts: activePostsByTag })
   } catch ({ name, message }) {
     next({
       name: `PostsTagError`,
