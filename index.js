@@ -18,6 +18,14 @@ server.use((req, res, next) => {
 
 server.use('/api', require('./api'))
 
+server.get('/background/:color', (req, res, next) => {
+  res.send(`
+  <body style="background: ${req.params.color}>
+  <h1>Hello World</h1>
+  </body>
+  `)
+})
+
 client.connect()
 
 server.listen(PORT, () => {
