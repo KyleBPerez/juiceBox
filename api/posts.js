@@ -3,19 +3,38 @@ const postsRouter = express.Router()
 const { getAllPosts, createPost, updatePost, getPostById } = require('../db')
 const { requireUser } = require('./utils')
 const jwt = require('jsonwebtoken')
-const { send } = require('express/lib/response')
 const { JWT_SECRET } = process.env
-
-// postsRouter.get('/:postId', async (req, res, next) => {
-//   const { postId } = req.params
-//   const speciPost = await getPostById(postId)
-//   res.send({ singlePost: speciPost })
-// })
 
 postsRouter.use((req, res, next) => {
   console.log('A request is being made to /posts')
 
   next()
+})
+
+postsRouter.delete('/:postId', requireUser, async (req, res, next) => {
+  try {
+    const post = await getPostById(req.params.postId)
+
+    if (post && post.author.id === req.user.id) {
+      const deletedPost = await updatePost(post.id, { active: false })
+
+      res.send({ post: deletedPost })
+    } else {
+      next(
+        post
+          ? {
+              name: `unauthorizedUserError`,
+              message: `You can't delete a post that's not yours`,
+            }
+          : {
+              name: `PostNotFoundError`,
+              message: `That post doesn't exist`,
+            }
+      )
+    }
+  } catch ({ name, message }) {
+    next({ name, message })
+  }
 })
 
 postsRouter.patch('/:postId', requireUser, async (req, res, next) => {
