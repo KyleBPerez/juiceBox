@@ -116,5 +116,3 @@ postsRouter.get('/', async (req, res, next) => {
 })
 
 module.exports = postsRouter
-
-// login token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhbGJlcnQiLCJpYXQiOjE2NDM3NjAxNTh9.M3Nr8koE3T01n6GVe8Ap9YH2C60xyzBxziWgMIPI_os
