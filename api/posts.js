@@ -75,8 +75,7 @@ postsRouter.patch('/:postId', requireUser, async (req, res, next) => {
 
 postsRouter.post('/', requireUser, async (req, res, next) => {
   const { title, content, tags = '' } = req.body
-  const prefix = 'Bearer '
-  const auth = req.header('Authorization')
+  const { id: userId } = req.user
 
   const tagArr = tags.trim().split(/\s+/)
   const postData = {}
@@ -85,29 +84,17 @@ postsRouter.post('/', requireUser, async (req, res, next) => {
     postData.tags = tagArr
   }
 
-  if (!auth) {
-    next()
-  } else if (auth.startsWith(prefix)) {
-    const token = auth.slice(prefix.length)
+  try {
+    postData.authorId = userId
+    postData.title = title
+    postData.content = content
+    const post = await createPost(postData)
 
-    try {
-      const { id } = jwt.verify(token, JWT_SECRET)
-      postData.authorId = id
-      postData.title = title
-      postData.content = content
-      const post = await createPost(postData)
-
-      res.send(post)
-    } catch ({ name, message }) {
-      next({
-        name: 'PostDataError',
-        message: 'All Required feilds not filld out',
-      })
-    }
-  } else {
+    res.send(post)
+  } catch ({ name, message }) {
     next({
-      name: 'AuthorizationHeaderError',
-      message: `Authorization token must start with ${prefix}`,
+      name: 'PostDataError',
+      message: 'All Required feilds not filld out',
     })
   }
 })
